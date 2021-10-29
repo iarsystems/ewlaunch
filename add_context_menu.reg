@@ -1,0 +1,27 @@
+Windows Registry Editor Version 5.00
+
+; Add to context menu for .eww files
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.eww\shell\EWlaunch\command]
+@="c:\\ewlaunch\\ewlaunch.exe \"%1\""
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.eww\shell\EWlaunch]
+"Icon"="c:\\ewlaunch\\ewlaunch.exe"
+
+; Add to context menu for .custom_argvars files
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.custom_argvars\shell\EWlaunch\command]
+@="c:\\ewlaunch\\ewlaunch.exe --select \"%1\""
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.custom_argvars\shell\EWlaunch]
+@="EWlaunch (select version)"
+"Icon"="c:\\ewlaunch\\ewlaunch.exe"
+
+; Add to context menu of folders
+
+[HKEY_CLASSES_ROOT\Directory\shell\EWlaunch\command]
+@="c:\\ewlaunch\\ewlaunch.exe \"%1\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\EWlaunch]
+"Icon"="c:\\ewlaunch\\ewlaunch.exe"
+"Position"="Top"
