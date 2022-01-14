@@ -3,5 +3,6 @@ __pycache__
 build/
 dist/
 ewlaunch.spec
+ewlaunch_win.spec
 *~
 #*#

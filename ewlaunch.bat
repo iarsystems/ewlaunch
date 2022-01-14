@@ -1,2 +1,2 @@
-cd /D "%~dp0"
-python ewlaunch.py %*
+@echo off
+python %~dp0\ewlaunch.py %*

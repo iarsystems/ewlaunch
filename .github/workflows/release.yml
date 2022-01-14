@@ -40,23 +40,27 @@ jobs:
             TARGET: windows
             CMD_BUILD: |
               mkdir ewlaunch
-              pyinstaller --windowed --onefile ewlaunch.py --icon=ewlaunch.ico
+              pyinstaller --windowed --onefile ewlaunch_win.py --icon=ewlaunch.ico
+              pyinstaller --onefile ewlaunch.py
+              Move-Item dist/ewlaunch_win.exe ewlaunch/
               Move-Item dist/ewlaunch.exe ewlaunch/
               Copy-Item installations.ini ewlaunch/
               Copy-Item ewlaunch.ini ewlaunch/
               Copy-Item add_context_menu.reg ewlaunch/
               Copy-Item remove_context_menu.reg ewlaunch/
               Copy-Item README.md ewlaunch/
+              Copy-Item init_env.bat ewlaunch/
+              Copy-Item init_shell.bat ewlaunch/
               Compress-Archive -Path ewlaunch/ ewlaunch-"${env:VERSION_TAG}".zip
 
             OUT_FILE_NAME: ewlaunch-${{ github.ref_name }}.zip
             ASSET_MIME: application.zip
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python 3.8
+    - name: Set up Python 3.9.7
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.9.7
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip

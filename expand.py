@@ -1,30 +1,47 @@
 import os
 
+_KEYS = {
+    'WS_PATH' : 'Full path of .eww file',
+    'WS_BPATH' : 'Path of .eww file, excluding file extension',
+    'WS_FNAME' : 'File name of .eww file',
+    'WS_BNAME' : 'File name of .eww file, excluding file extension',
+    'WS_DIR' : 'Directory of .eww file',
+    'EW_VERSION' : 'The version of IAR Embedded Workbench',
+    'EW_DIR' : 'Top directory of IAR Embedded Workbench',
+    'TOOLKIT' : 'Name of toolkit directory, e.g. "arm"',
+    'TOOLKIT_DIR' : 'Full path of toolkit directory'
+}
+
 class Expand:
     def __init__(self):
-        self.ew_ver = ""
-        self.ws = ""
-        self.ws_fname = ""
-        self.ws_bname = ""
-        self.ws_dir = ""
-        self.ws_bpath = ""
+        self.attrs = {}
+        for key in _KEYS:
+            self.attrs[key] = ''
+
+    def set(self, k, v):
+        self.attrs[k] = v
+
+    def get(self, k):
+        return self.attrs[k]
 
     def set_ew(self, ew):
-        self.ew_ver = ew.key()
+        self.set('EW_VERSION', ew.key)
+        self.set('EW_DIR', ew.ew_dir)
+        self.set('TOOLKIT', os.path.basename(ew.toolkit_dir))
+        self.set('TOOLKIT_DIR', ew.toolkit_dir)
 
     def set_ws(self, ws):
-        self.ws = ws
-        self.ws_fname = os.path.basename(ws)
-        self.ws_bname = self.ws_fname.replace(".eww", "")
-        self.ws_dir = os.path.dirname(ws)
-        self.ws_bpath = self.ws_dir + "\\" + self.ws_bname
+        self.set('WS_PATH', ws)
+        self.set('WS_FNAME', os.path.basename(ws))
+        self.set('WS_BNAME', self.get('WS_FNAME').replace('.eww', ''))
+        self.set('WS_DIR', os.path.dirname(ws))
+        self.set('WS_BPATH', os.path.join(self.get('WS_DIR'), self.get('WS_BNAME')))
 
-    def expand(self, str):
-        str = str.replace(r'$WS_PATH$', self.ws)
-        str = str.replace(r'$WS_BPATH$', self.ws_bpath)
-        str = str.replace(r'$WS_BNAME$', self.ws_bname)
-        str = str.replace(r'$WS_DIR$', self.ws_dir)
-        str = str.replace(r'$EW_VERSION$', self.ew_ver)
-        return str
+    def expand(self, s):
+        for key, val in self.attrs.items():
+            s = s.replace(r'$' + key + r'$', val)
+        return s
 
-exp = Expand()
+    def setenv(self):
+        for key, val in self.attrs.items():
+            os.environ[key] = val

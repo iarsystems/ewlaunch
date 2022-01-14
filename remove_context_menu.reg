@@ -1,5 +1,13 @@
 Windows Registry Editor Version 5.00
 
 [-HKEY_CLASSES_ROOT\SystemFileAssociations\.eww\shell\EWlaunch]
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.eww\shell\EWlaunchSelect]
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.eww\shell\EWlaunchShell]
+
 [-HKEY_CLASSES_ROOT\SystemFileAssociations\.custom_argvars\shell\EWlaunch]
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.custom_argvars\shell\EWlaunchSelect]
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.custom_argvars\shell\EWlaunchShell]
+
 [-HKEY_CLASSES_ROOT\Directory\shell\EWlaunch]
+[-HKEY_CLASSES_ROOT\Directory\shell\EWlaunchSelect]
+[-HKEY_CLASSES_ROOT\Directory\shell\EWlaunchShell]
