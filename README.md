@@ -14,16 +14,28 @@ It is possible to receive [notifications][url-gh-docs-notify] about updates in y
 
 ## Setup
 
-Edit the file `context_menu.reg` with the path to `ewlaunch.exe`, and run it to add the entries to the registry. This makes __EWlaunch__ available as a context menu action, accessible by right-clicking on a file/folder in the Windows file explorer.
+Download and extract the latest [binary release][url-repo-latest-zip].
 
-Optionally, see [ewlaunch.ini](ewlaunch.ini) for configuration options, and [installations.ini](installations.ini) to manually specify installation locations.
+You should see `ewlaunch.exe` among the extracted files, otherwise please verify that you downloaded the [binary release][url-repo-latest-zip] rather than the source code.
 
+(Optional) add __EWlaunch__ to the right-click context menu in Windows file explorer:
+1. Edit `add_context_menu.reg` with the path to `ewlaunch.exe` (the default is `c:\ewlaunch\ewlaunch.exe`).
+2. Run `add_context_menu.reg` to add the entries to the registry. 
+
+(Optional) associate the file types `.eww` and/or `.custom_argvars`:
+1. Shift + right-click on a file, of the type that you want to be opened by __EWlaunch__.
+2. Select __Open With > Select Program ...__
+3. Browse to locate `ewlaunch.exe`.
+4. Select __Always use this program__.
 
 ## Usage
 
-Below are some examples of how to perform common tasks using __EWlaunch__:
+Below are some examples of how to perform common tasks using __EWlaunch__.
+
+See [ewlaunch.ini](ewlaunch.ini) for configuration options, and [installations.ini](installations.ini) to manually specify installation locations.
 
 ### Open an existing workspace (.eww) file
+
 Right-click on a `<workspace>.eww` file, or on a folder containing a `<workspace>.eww` file. Select __EWlaunch__ in the context menu.
 
 __EWlaunch__ inspects the corresponding `.custom_argvars` file to discover which version of _IAR Embedded Workbench_ to launch. If it does not find such information, then a selection dialog will be shown.
@@ -44,4 +56,5 @@ When an empty workspace name is used, __EWlaunch__ launches the selected version
 [url-repo-home]:         https://github.com/IARSystems/ewlaunch
 [url-repo-issue-new]:    https://github.com/IARSystems/ewlaunch/issues/new
 [url-repo-issue-old]:    https://github.com/IARSystems/ewlaunch/issues?q=is%3Aissue+is%3Aopen%7Cclosed
+[url-repo-latest-zip]:   https://github.com/IARSystems/ewlaunch/releases/download/v1.0/ewlaunch-1.0.zip
 [url-gh-docs-notify]:    https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications
