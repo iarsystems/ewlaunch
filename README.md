@@ -56,5 +56,5 @@ When an empty workspace name is used, __EWlaunch__ launches the selected version
 [url-repo-home]:         https://github.com/IARSystems/ewlaunch
 [url-repo-issue-new]:    https://github.com/IARSystems/ewlaunch/issues/new
 [url-repo-issue-old]:    https://github.com/IARSystems/ewlaunch/issues?q=is%3Aissue+is%3Aopen%7Cclosed
-[url-repo-latest-zip]:   https://github.com/IARSystems/ewlaunch/releases/download/v1.0/ewlaunch-1.0.zip
+[url-repo-latest-zip]:   https://github.com/IARSystems/ewlaunch/releases/latest
 [url-gh-docs-notify]:    https://docs.github.com/en/github/managing-subscriptions-and-notifications-on-github/setting-up-notifications/about-notifications
