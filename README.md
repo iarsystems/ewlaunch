@@ -23,14 +23,14 @@ There are two binaries in the __EWlaunch__ installation:
 
 ### Context Menu
 To add __EWlaunch__ to the right-click context menu in Windows file explorer:
-1. Edit `add_context_menu.reg` with the path to `ewlaunch.exe` (the default is `c:\ewlaunch\ewlaunch.exe`).
-2. Run `add_context_menu.reg` to add the entries to the registry.
+1. Edit `add_context_menu.reg` with the path to `ewlaunch.exe` (the default is `c:\ewlaunch\ewlaunch_win.exe`).
+2. Run `remove_context_menu.reg` to add the entries to the registry.
 
 ### File Type Association
 To associate the file types `.eww` and/or `.custom_argvars`:
 1. Shift + right-click on a file, of the type that you want to be opened by __EWlaunch__.
 2. Select __Open With > Select Program ...__
-3. Browse to locate `ewlaunch.exe`.
+3. Browse to locate `ewlaunch_win.exe`.
 4. Select __Always use this program__.
 
 
