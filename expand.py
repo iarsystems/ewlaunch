@@ -1,4 +1,5 @@
 import os
+import cfg
 
 _KEYS = {
     'WS_PATH' : 'Full path of .eww file',
@@ -9,7 +10,8 @@ _KEYS = {
     'EW_VERSION' : 'The version of IAR Embedded Workbench',
     'EW_DIR' : 'Top directory of IAR Embedded Workbench',
     'TOOLKIT' : 'Name of toolkit directory, e.g. "arm"',
-    'TOOLKIT_DIR' : 'Full path of toolkit directory'
+    'TOOLKIT_DIR' : 'Full path of toolkit directory',
+    'EWLAUNCH_DIR' : 'Full path fo EWLaunch directory'
 }
 
 class Expand:
@@ -17,6 +19,7 @@ class Expand:
         self.attrs = {}
         for key in _KEYS:
             self.attrs[key] = ''
+        self.set('EWLAUNCH_DIR', cfg.ewlaunch_dir)
 
     def set(self, k, v):
         self.attrs[k] = v

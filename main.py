@@ -82,7 +82,7 @@ def main():
     if cfg.reg:
         ewinst.add_from_reg()
     if cfg.installations:
-        ewinst.add_from_file(cfg.installations)
+        ewinst.add_from_file(exp.expand(cfg.installations))
 
     if cfg.subcmd == 'dump':
         ewinst.dump(cfg.out_file)

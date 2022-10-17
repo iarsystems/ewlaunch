@@ -78,8 +78,6 @@ def read():
     cfg.always_show_log = getflag('log')
     cfg.wait_after_launch = getflag('wait')
     cfg.installations = getstr('installations')
-    if cfg.installations and not os.path.isabs(cfg.installations):
-        cfg.installations = os.path.join(cfg.ewlaunch_dir, cfg.installations)
     cfg.reg = getflag('reg', fallback=(cfg.installations is None))
     cfg.default_version = ini['gui']['default_selected_version']
     cfg.default_save = ini.getboolean('gui', 'default_selected_save_in_project')
