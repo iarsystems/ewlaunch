@@ -47,10 +47,8 @@ class ArgVars:
         if not m:
             log.debug('Argvars file exists, but does not contain EW_VERSION, adding it')
             with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
-                argvars = argvars.replace('<iarUserArgVars/>',
-                    '<iarUserArgVars>\n</iarUserArgVars>')
-                argvars_file.write(argvars.replace(
-                    '<iarUserArgVars>', '<iarUserArgVars>\n' + exp.expand(cfg.template)))
+                argvars = re.sub('<iarUserArgVars */>', '<iarUserArgVars>\n</iarUserArgVars>', argvars)
+                argvars_file.write(argvars.replace('<iarUserArgVars>', '<iarUserArgVars>\n' + exp.expand(cfg.template)))
             return
 
         replaced_argvars = re.sub(cfg.argvars_version_re, m.group(1) + version, argvars, flags=re.M)
