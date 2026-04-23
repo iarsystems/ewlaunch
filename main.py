@@ -144,12 +144,11 @@ def main():
             if argvars_ver:
                 ew_initial = ewinst.get(argvars_ver)
                 if ew_initial:
-                    selsrc = 'Using version from argvars file (' + \
-                        argvars_ver + ').'
+                    selsrc = 'Using version from argvars file'
                     using_argvars = True
                 else:
-                    selsrc = 'WARNING: Invalid version in argvars (' + \
-                        argvars_ver + '). '
+                    selsrc = 'WARNING: Invalid version in argvars'
+                selsrc += f' ({argvars_ver}).'
             else:
                 selsrc = 'No version in argvars file. '
 

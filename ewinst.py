@@ -37,9 +37,13 @@ def find_tkdir(dr, subd=None):
 
 
 def find_idepm(ew_dir):
-    for p in [os.path.join(ew_dir, 'common', 'bin', 'IarIdePm.exe')]:
-        if os.path.isfile(p):
-            return p
+    common_bin = os.path.join(ew_dir, 'common', 'bin')
+    iaridepm = os.path.join(common_bin, 'IarIdePm.exe')
+    if os.path.isfile(iaridepm):
+        return iaridepm
+    iaride = os.path.join(common_bin, 'iaride.exe')
+    if os.path.isfile(iaride):
+        return iaride
     return None
 
 
