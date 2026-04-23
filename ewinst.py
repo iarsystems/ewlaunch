@@ -2,6 +2,7 @@ import collections
 import configparser
 import os
 import re
+import sys
 import winreg
 
 import cfg
@@ -75,12 +76,14 @@ class EwInst:
             self.toolkit_dir = find_tkdir(self.ew_dir)
 
     def get_info(self):
+        def p(k, v):
+            return '  ' + k + ': ' + str(v) + '\n'
         msg = '[' + self.key + ']\n'
-        for k, v in [('EW_DIR', self.ew_dir)]:
+        for k, v in [('EW_DIR', self.ew_dir), ('SRC', self.source)]:
             if v:
-                msg += '  ' + k + ': ' + str(v) + '\n'
+                msg += p(k, v)
         for k, v in self.info.items():
-            msg += '  ' + k + ': ' + str(v) + '\n'
+            msg += p(k, v)
         return msg
 
 
@@ -179,16 +182,23 @@ def add_from_file(filename):
             ew.set_attr(attr, sect[attr])
 
 
-def dump(file):
+def _dump(f):
     frist = True
-    with open(file, 'w', encoding='utf-8') as f:
-        for ew in installations.values():
-            if not frist:
-                f.write('\n')
-            else:
-                frist = False
-            f.write(ew.get_info())
-    print('\nWrote ' + file + ' ... Done')
+    for ew in installations.values():
+        if not frist:
+            f.write('\n')
+        else:
+            frist = False
+        f.write(ew.get_info())
+
+
+def dump(filename):
+    if filename == '-':
+        _dump(sys.stdout)
+    else:
+        with open(filename, 'w', encoding='utf-8') as f:
+            _dump(f)
+        print('\nWrote ' + filename + ' ... Done')
 
 
 def _test(dr, subd):
@@ -237,3 +247,5 @@ def scan(rootdirs):
         if r == 0:
             print('Note: No installations found in ' + d)
     print('total: ' + str(total) + ' installations found')
+    if cfg.out_file == '-':
+        print()

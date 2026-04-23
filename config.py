@@ -20,6 +20,7 @@ def _parse_command_line():
     def opt_installations(p):
         p.add_argument(
             '--installations',
+            metavar='FILE',
             help='Specify the name of an installations file.')
         p.add_argument('--reg',  action='store_true',
                        help='with --installations file: look also in registry')
@@ -61,15 +62,18 @@ def _parse_command_line():
                        help="don't print EW version before command output")
 
         p = subp.add_parser('dump', help='write known installations to a file')
-        p.add_argument('--file', nargs='?',
-                       default='dump.ini', help='output file')
+        p.add_argument('--output', nargs='?', metavar='FILE',
+                       default='dump.ini',
+                       help='output file or "-" for stdout'
+                       ', default is "dump.ini"')
         opt_installations(p)
 
         p = subp.add_parser('scan', help='scan directories for installations')
         p.add_argument('directories', metavar='DIR', nargs='+',
                        help='directory to search for installations')
-        p.add_argument('--file', nargs='?', default='scan.ini',
-                       help='output file')
+        p.add_argument('--output', nargs='?', metavar='FILE', default='scan.ini',
+                       help='output file or "-" for stdout'
+                       ', default is "scan.ini"')
 
     argv = sys.argv[1:]
     # pylint: disable=protected-access
@@ -124,7 +128,7 @@ def read():
     cfg.subcmd = args.subparser_name
     cfg.ws = getarg('workspace', '')
     cfg.version = getarg('version')
-    cfg.out_file = getarg('file')
+    cfg.out_file = getarg('output')
     cfg.rest_args = getarg('directories')
     cfg.version_filter = getarg('filter')
     if cfg.subcmd == 'command':
