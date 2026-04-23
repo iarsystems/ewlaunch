@@ -1,6 +1,9 @@
 import sys
 
-import log, main, cfg
+import cfg
+import log
+import main
+
 
 class Logger:
     def __init__(self):
@@ -13,6 +16,7 @@ class Logger:
     def die(self, message):
         print('died: ' + message)
         sys.exit(1)
+
 
 cfg.exec_name = 'ewlaunch'
 cfg.console = True

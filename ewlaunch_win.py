@@ -1,4 +1,7 @@
-import log, main, dialog_logger, cfg
+import cfg
+import dialog_logger
+import log
+import main
 
 cfg.exec_name = 'ewlaunch_win'
 cfg.console = False

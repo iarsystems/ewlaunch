@@ -1,6 +1,9 @@
-import re, os
+import os
+import re
 
-import log, cfg
+import cfg
+import log
+
 
 class ArgVars:
     def __init__(self):
@@ -45,13 +48,19 @@ class ArgVars:
 
         m = re.search(cfg.argvars_version_re, argvars, re.M)
         if not m:
-            log.debug('Argvars file exists, but does not contain EW_VERSION, adding it')
+            log.debug('Argvars file exists, with no EW_VERSION, adding it')
             with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
-                argvars = re.sub('<iarUserArgVars */>', '<iarUserArgVars>\n</iarUserArgVars>', argvars)
-                argvars_file.write(argvars.replace('<iarUserArgVars>', '<iarUserArgVars>\n' + exp.expand(cfg.template)))
+                argvars = re.sub(
+                    '<iarUserArgVars */>',
+                    '<iarUserArgVars>\n</iarUserArgVars>',
+                    argvars)
+                argvars_file.write(argvars.replace(
+                    '<iarUserArgVars>',
+                    '<iarUserArgVars>\n' + exp.expand(cfg.template)))
             return
 
-        replaced_argvars = re.sub(cfg.argvars_version_re, m.group(1) + version, argvars, flags=re.M)
+        replaced_argvars = re.sub(cfg.argvars_version_re, m.group(
+            1) + version, argvars, flags=re.M)
         if replaced_argvars == argvars:
             log.debug('No change to argvars, skip writing')
             return

@@ -1,7 +1,10 @@
-import sys, io, traceback
+import io
+import sys
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+import traceback
 from contextlib import redirect_stderr, redirect_stdout
+from tkinter import scrolledtext, ttk
+
 
 class Log:
     def __init__(self, title):
@@ -36,7 +39,8 @@ class Log:
         print(message)
 
     def die(self, message):
-        if self.died: return
+        if self.died:
+            return
         self.died = True
         print()
         print('died: ' + message)
@@ -48,7 +52,7 @@ class Log:
             with redirect_stderr(self.messages):
                 try:
                     func()
-                except Exception:#pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-except
                     self.die('Exception caught:\n' + traceback.format_exc())
                 except SystemExit:
                     self.die('SystemExit')

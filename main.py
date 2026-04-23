@@ -1,12 +1,25 @@
-import os, subprocess, locale
+import locale
+import os
+import subprocess
 
-import ewinst, argvars, dialog, log, cfg, expand, config
+import argvars
+import cfg
+import config
+import dialog
+import ewinst
+import expand
+import log
+
 
 def check_workspace(ws):
-    if not ws: return ws
-    if not os.path.isabs(ws): log.die('path not absolute: ' + ws)
-    if not ws.endswith('.eww'): ws += '.eww'
+    if not ws:
+        return ws
+    if not os.path.isabs(ws):
+        log.die('path not absolute: ' + ws)
+    if not ws.endswith('.eww'):
+        ws += '.eww'
     return ws
+
 
 def get_workspace(ws):
     def find_eww(dr):
@@ -15,14 +28,17 @@ def get_workspace(ws):
                 return os.path.join(dr, f)
         return ''
 
-    if not ws: return ws
+    if not ws:
+        return ws
     ws = os.path.abspath(ws)
 
     if os.path.isdir(ws):
         tmp = os.path.join(ws, os.path.basename(ws)) + '.eww'
-        if os.path.isfile(tmp): return tmp
+        if os.path.isfile(tmp):
+            return tmp
         tmp2 = find_eww(ws)
-        if tmp2: return tmp2
+        if tmp2:
+            return tmp2
         return tmp
 
     if os.path.isfile(ws):
@@ -38,6 +54,7 @@ def get_workspace(ws):
 
     return check_workspace(ws)
 
+
 def create_workspace(ws, exp):
     if not os.path.isfile(ws):
         dn = os.path.dirname(ws)
@@ -47,6 +64,7 @@ def create_workspace(ws, exp):
         log.debug('Writing eww: ' + ws)
         with open(ws, 'w', encoding='utf8') as f:
             f.write(exp.expand(cfg.workspace_template))
+
 
 def launch(ws, ew_sel, exp):
     if cfg.subcmd == 'shell':
@@ -59,9 +77,11 @@ def launch(ws, ew_sel, exp):
             proc = subprocess.Popen('start cmd /k ' + initenv, shell=True)
     else:
         os.chdir(cfg.ewlaunch_dir)
-        if ew_sel.ide_exe is None: log.die('EW version does not exist')
-        cmd_args = [ ew_sel.ide_exe ]
-        if ws: cmd_args.append(ws)
+        if ew_sel.ide_exe is None:
+            log.die('EW version does not exist')
+        cmd_args = [ew_sel.ide_exe]
+        if ws:
+            cmd_args.append(ws)
         log.debug('Launching: ' + cmd_args[0])
         proc = subprocess.Popen(cmd_args, shell=False)
 
@@ -96,9 +116,13 @@ def main():
             if cfg.rest_args:
                 if not cfg.noheading:
                     print(ew.key + ':')
-                args = [os.path.join(cfg.ewlaunch_dir, 'init_env.bat'), '&&'] + cfg.rest_args
-                ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                        encoding=locale.getpreferredencoding(), check=False)
+                args = [os.path.join(
+                    cfg.ewlaunch_dir, 'init_env.bat'), '&&'] + cfg.rest_args
+                ret = subprocess.run(args,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT,
+                                     encoding=locale.getpreferredencoding(),
+                                     check=False)
                 print(ret.stdout.strip())
             else:
                 print(ew.key)
@@ -120,10 +144,12 @@ def main():
             if argvars_ver:
                 ew_initial = ewinst.get(argvars_ver)
                 if ew_initial:
-                    selsrc = 'Using version from argvars file (' + argvars_ver + ').'
+                    selsrc = 'Using version from argvars file (' + \
+                        argvars_ver + ').'
                     using_argvars = True
                 else:
-                    selsrc = 'WARNING: Invalid version in argvars (' + argvars_ver + '). '
+                    selsrc = 'WARNING: Invalid version in argvars (' + \
+                        argvars_ver + '). '
             else:
                 selsrc = 'No version in argvars file. '
 
@@ -150,7 +176,8 @@ def main():
             selected_save = dlg.selected_save
 
     ws = check_workspace(ws)
-    if not ew_sel: log.die('could not find EW version')
+    if not ew_sel:
+        log.die('could not find EW version')
     ew_sel.check()
     exp.set_ws(ws)
     exp.set_ew(ew_sel)

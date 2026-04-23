@@ -1,18 +1,20 @@
 import os
+
 import cfg
 
 _KEYS = {
-    'WS_PATH' : 'Full path of .eww file',
-    'WS_BPATH' : 'Path of .eww file, excluding file extension',
-    'WS_FNAME' : 'File name of .eww file',
-    'WS_BNAME' : 'File name of .eww file, excluding file extension',
-    'WS_DIR' : 'Directory of .eww file',
-    'EW_VERSION' : 'The version of IAR Embedded Workbench',
-    'EW_DIR' : 'Top directory of IAR Embedded Workbench',
-    'TOOLKIT' : 'Name of toolkit directory, e.g. "arm"',
-    'TOOLKIT_DIR' : 'Full path of toolkit directory',
-    'EWLAUNCH_DIR' : 'Full path fo EWLaunch directory'
+    'WS_PATH': 'Full path of .eww file',
+    'WS_BPATH': 'Path of .eww file, excluding file extension',
+    'WS_FNAME': 'File name of .eww file',
+    'WS_BNAME': 'File name of .eww file, excluding file extension',
+    'WS_DIR': 'Directory of .eww file',
+    'EW_VERSION': 'The version of IAR Embedded Workbench',
+    'EW_DIR': 'Top directory of IAR Embedded Workbench',
+    'TOOLKIT': 'Name of toolkit directory, e.g. "arm"',
+    'TOOLKIT_DIR': 'Full path of toolkit directory',
+    'EWLAUNCH_DIR': 'Full path fo EWLaunch directory'
 }
+
 
 class Expand:
     def __init__(self):
@@ -38,7 +40,8 @@ class Expand:
         self.set('WS_FNAME', os.path.basename(ws))
         self.set('WS_BNAME', self.get('WS_FNAME').replace('.eww', ''))
         self.set('WS_DIR', os.path.dirname(ws))
-        self.set('WS_BPATH', os.path.join(self.get('WS_DIR'), self.get('WS_BNAME')))
+        self.set('WS_BPATH', os.path.join(
+            self.get('WS_DIR'), self.get('WS_BNAME')))
 
     def expand(self, s):
         for key, val in self.attrs.items():
