@@ -98,7 +98,9 @@ There are additional commands for dealing with installation files:
 
 ## Version history
 
-- 2.0 - 2022-05-24 - shell and command function.
+- 2.2 - 2026-04-25 - Store runtime in `_internal` dir, to avoid tmp dir error.
+- 2.1 - 2025-02-04 - Custom_argvars parsing bugfix
+- 2.0 - 2022-05-24 - Shell and command function.
 - 1.0 - 2020-11-01 - Initial version
 
 <!-- Links -->

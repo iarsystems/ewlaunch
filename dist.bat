@@ -1,6 +1,6 @@
 @echo off
 setlocal
-REM Tested with Python: 3.9.7, PyInstaller: 4.5.1
+REM Tested with Python: 3.14.4
 
 set VERSION=%1
 set ZIP="C:\Program Files\WinRAR\WinRar.exe"
@@ -8,8 +8,8 @@ set DIST=dist
 set D=ewlaunch-%VERSION%
 set TGT=%D%.zip
 
-pyinstaller --onefile --windowed ewlaunch_win.py --icon=ewlaunch.ico
-pyinstaller --onefile ewlaunch.py
+pyinstaller --windowed ewlaunch_win.py --icon=ewlaunch.ico
+pyinstaller ewlaunch.py
 
 cd %DIST%
 del /q %TGT% 2>nul
@@ -27,8 +27,9 @@ copy ewlaunch.ini %DIST%\%D%
 copy README.md %DIST%\%D%
 copy init_env.bat %DIST%\%D%
 copy init_shell.bat %DIST%\%D%
-move %DIST%\ewlaunch.exe %DIST%\%D%
-move %DIST%\ewlaunch_win.exe %DIST%\%D%
+move %DIST%\ewlaunch\ewlaunch.exe %DIST%\%D%
+move %DIST%\ewlaunch_win\ewlaunch_win.exe %DIST%\%D%
+move %DIST%\ewlaunch_win\_internal %DIST%\%D%
 
 cd %DIST%
 %ZIP%  a -r %TGT% %D%
