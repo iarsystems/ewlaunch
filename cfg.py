@@ -8,6 +8,7 @@ default_save = None
 list_box_lines = None
 min_window_width = None
 info_pane = None
+ttk_style = None
 template_header = None
 template = None
 template_footer = None

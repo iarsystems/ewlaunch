@@ -71,8 +71,8 @@ def _parse_command_line():
         p = subp.add_parser('scan', help='scan directories for installations')
         p.add_argument('directories', metavar='DIR', nargs='+',
                        help='directory to search for installations')
-        p.add_argument('--output', nargs='?', metavar='FILE', default='scan.ini',
-                       help='output file or "-" for stdout'
+        p.add_argument('--output', nargs='?', metavar='FILE',
+                       default='scan.ini', help='output file or "-" for stdout'
                        ', default is "scan.ini"')
 
     argv = sys.argv[1:]
@@ -116,6 +116,7 @@ def read():
     cfg.list_box_lines = ini.getint('gui', 'list_box_lines', fallback=10)
     cfg.min_window_width = ini.getint('gui', 'min_window_width', fallback=500)
     cfg.info_pane = ini.getboolean('gui', 'info_pane', fallback=True)
+    cfg.ttk_style = ini.get('gui', 'ttk_style', fallback=None)
     cfg.template_header = _multiline(ini['argvars']['template_header'])
     cfg.template = _multiline(ini['argvars']['template'])
     cfg.template_footer = _multiline(ini['argvars']['template_footer'])

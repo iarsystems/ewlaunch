@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import IntVar, Listbox, StringVar, filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinter.ttk import (Button, Checkbutton, Entry, Frame, Label, LabelFrame,
-                         PanedWindow, Scrollbar)
+                         PanedWindow, Scrollbar, Style)
 
 import cfg
 import ewinst
@@ -110,8 +110,9 @@ class Dialog:
         app.title('Select IAR Embedded Workbench version')
         app.minsize(cfg.min_window_width, 0)
 
-        # style = Style()
-        # style.theme_use('vista')
+        if cfg.ttk_style:
+            style = Style()
+            style.theme_use(cfg.ttk_style)
 
         root = Frame()
         root.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
