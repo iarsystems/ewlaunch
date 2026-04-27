@@ -1,12 +1,17 @@
 @echo off
 setlocal
-REM Tested with Python: 3.14.4
+REM Tested with Python: 3.13.13
 
 set VERSION=%1
 set ZIP="C:\Program Files\WinRAR\WinRar.exe"
 set DIST=dist
 set D=ewlaunch-%VERSION%
 set TGT=%D%.zip
+
+cd %DIST%
+rmdir /q /s ewlaunch 2>nul
+rmdir /q /s ewlaunch_win 2>nul
+cd ..
 
 pyinstaller --windowed ewlaunch_win.py --icon=ewlaunch.ico
 pyinstaller ewlaunch.py
