@@ -1,6 +1,6 @@
 @echo off
 setlocal
-REM Tested with Python: 3.13.13
+REM Tested with Python: 3.14.4, PyInstaller 6.22.3
 
 set VERSION=%1
 set ZIP="C:\Program Files\WinRAR\WinRar.exe"
