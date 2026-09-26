@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch: # "Run workflow" button: test build, no release
+    inputs:
+      ref:
+        description: "Commit SHA, tag or branch (default: selected branch)"
+        required: false
+        default: ""
 
 permissions:
   contents: write   # required for releases
@@ -19,6 +25,8 @@ jobs:
       # ------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
 
       # ------------------------------------------------------------
       # Python setup
@@ -39,7 +47,13 @@ jobs:
       - name: Build with PyInstaller
         env:
           VERSION_TAG: ${{ github.ref_name }}
+          IS_RELEASE: ${{ github.event_name == 'push' }}
         run: |
+          if ($env:IS_RELEASE -ne 'true') {
+            $env:VERSION_TAG = "test-$(git rev-parse --short HEAD)"
+          }
+          "ZIP=ewlaunch-$env:VERSION_TAG.zip" >> $env:GITHUB_ENV
+
           mkdir ewlaunch
 
           pyinstaller --windowed ewlaunch_win.py --icon=ewlaunch.ico
@@ -59,10 +73,19 @@ jobs:
 
           Compress-Archive ewlaunch "ewlaunch-$env:VERSION_TAG.zip"
 
+      - name: Upload test build
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ env.ZIP }}
+          archive: false
+          retention-days: 30
+
       # ------------------------------------------------------------
       # Release
       # ------------------------------------------------------------
       - name: Create GitHub release (if missing)
+        if: github.event_name == 'push'
         shell: bash
         run: |
           gh release view "${{ github.ref_name }}" \
@@ -80,10 +103,9 @@ jobs:
       #     ls -lah
 
       - name: Upload release asset
+        if: github.event_name == 'push'
         shell: bash
         run: |
-          gh release upload "${{ github.ref_name }}" \
-            "./ewlaunch-${{ github.ref_name }}.zip" \
-            --clobber
+          gh release upload "${{ github.ref_name }}" "./$ZIP" --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
