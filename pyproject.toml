@@ -1,4 +1,6 @@
 [tool.pyright]
+pythonVersion = "3.14"
+pythonPlatform = "Windows"
 reportUnusedImport = true
 reportUnusedVariable = true
 reportUnreachable = true

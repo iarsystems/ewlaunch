@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  lint:
+    name: ruff + pyright
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+
+      - name: ruff
+        run: uvx ruff@0.16.9 check --output-format=github .
+
+      - name: pyright
+        run: uvx pyright@1.1.414 .
