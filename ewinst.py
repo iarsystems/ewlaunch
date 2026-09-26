@@ -94,12 +94,12 @@ def get(version_) -> EwInst | None:
     version = _shortname(version_).casefold()
     if len(version) == 0:
         return None
+    for ew in installations.values():
+        if version == ew.key.casefold():
+            return ew
     found = None
     for ew in installations.values():
-        ewkey = ew.key.casefold()
-        if version == ewkey:
-            return ew
-        if version in ewkey:
+        if version in ew.key.casefold():
             if found:
                 log.die('Multiple versions matching ' +
                         version_ + ': ' + found.key + ', ' + ew.key)

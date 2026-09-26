@@ -3,7 +3,7 @@
 
 if "%WS_FNAME%"=="" (title %EW_VERSION%) else (title %EW_VERSION% - %WS_FNAME%)
 
-call %~dp0\init_env.bat
+call "%~dp0init_env.bat"
 
 echo [90mRunning %0 ...
 echo.

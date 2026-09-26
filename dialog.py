@@ -78,7 +78,7 @@ class Dialog:
                 if cfg.info_pane:
                     info.configure(state=tk.NORMAL)
                     info.replace('1.0', tk.END, ew.get_info())
-                    info.configure(state=tk.NORMAL)
+                    info.configure(state=tk.DISABLED)
 
         def deselect_inst():
             ok_button.configure(state=tk.DISABLED)

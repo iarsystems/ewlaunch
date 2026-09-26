@@ -85,7 +85,9 @@ def _parse_command_line():
 
 
 def _multiline(s):
-    return (s.replace(s[0], '') if s[0] == '|' else s) + '\n'
+    # strip the leading '|' that preserves indentation on each line
+    return '\n'.join(line.removeprefix('|')
+                     for line in s.split('\n')) + '\n'
 
 
 def read():

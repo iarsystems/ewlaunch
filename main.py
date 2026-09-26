@@ -45,7 +45,7 @@ def get_workspace(ws):
         if ws.endswith('.eww'):
             return ws
         if ws.endswith('.custom_argvars'):
-            return ws.replace('.custom_argvars', '.eww')
+            return str(ws_path.with_suffix('.eww'))
 
         log.die('Unexpected file name:' + ws)
 

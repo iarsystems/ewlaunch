@@ -8,4 +8,4 @@ set PROJ_DIR=%WS_DIR%
 set PATH=%TOOLKIT_DIR%\bin;%EW_DIR%\common\bin;%PATH%
 
 :: change directory to workspace directory
-if not "%WS_DIR%"=="" cd %WS_DIR%
+if not "%WS_DIR%"=="" cd /d "%WS_DIR%"
