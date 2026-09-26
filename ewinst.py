@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import winreg
+from typing import Optional
 
 import cfg
 import log
@@ -93,7 +94,7 @@ def _shortname(ver):
     return ver
 
 
-def get(version_) -> EwInst:
+def get(version_) -> Optional[EwInst]:
     version = _shortname(version_).casefold()
     if len(version) == 0:
         return None
@@ -172,7 +173,7 @@ def add_from_file(filename):
         log.die('could not open ' + filename)
 
     cp = configparser.ConfigParser()
-    cp.optionxform = str
+    cp.optionxform = str  # pyright: ignore[reportAttributeAccessIssue]
     cp.read(filename)
 
     for sectname in cp.sections():
@@ -208,7 +209,7 @@ def _test(dr, subd):
     inst = EwInst(os.path.basename(tk) + ' ' +
                   os.path.basename(dr), dr, 'scan', tk)
     inst.check()
-    bn = os.path.basename(inst.toolkit_dir)
+    bn = os.path.basename(tk)
     has_ide = str(inst.ide_exe is not None)
     print(f'{dr}: tk={bn} ide={has_ide}')
     return True

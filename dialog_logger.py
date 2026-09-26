@@ -4,6 +4,7 @@ import tkinter as tk
 import traceback
 from contextlib import redirect_stderr, redirect_stdout
 from tkinter import scrolledtext, ttk
+from typing import NoReturn
 
 
 class Log:
@@ -38,9 +39,9 @@ class Log:
     def debug(self, message):
         print(message)
 
-    def die(self, message):
+    def die(self, message) -> NoReturn:
         if self.died:
-            return
+            sys.exit(1)
         self.died = True
         print()
         print('died: ' + message)

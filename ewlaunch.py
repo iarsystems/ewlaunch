@@ -1,4 +1,5 @@
 import sys
+from typing import NoReturn
 
 import cfg
 import log
@@ -13,7 +14,7 @@ class Logger:
         if self.print_debug:
             print(message)
 
-    def die(self, message):
+    def die(self, message) -> NoReturn:
         print('died: ' + message)
         sys.exit(1)
 

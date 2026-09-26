@@ -32,8 +32,6 @@ class Dialog:
         self.ewi = None
 
     def show(self, ws, ew_initial, selsrc):
-        lbox = None
-
         def lbox_select(_e):
             if len(lbox.curselection()) > 0:
                 self.current_lbox_item = lbox.curselection()[0]
