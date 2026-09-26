@@ -3,8 +3,17 @@ import re
 import tkinter as tk
 from tkinter import IntVar, Listbox, StringVar, filedialog
 from tkinter.scrolledtext import ScrolledText
-from tkinter.ttk import (Button, Checkbutton, Entry, Frame, Label, LabelFrame,
-                         PanedWindow, Scrollbar, Style)
+from tkinter.ttk import (
+    Button,
+    Checkbutton,
+    Entry,
+    Frame,
+    Label,
+    LabelFrame,
+    PanedWindow,
+    Scrollbar,
+    Style,
+)
 
 import cfg
 import ewinst
@@ -47,7 +56,7 @@ class Dialog:
 
             lbox.delete(0, tk.END)
             for opt in optlist:
-                if inp == '' or re.search(pat, opt, re.I):
+                if inp == '' or re.search(pat, opt, re.IGNORECASE):
                     lbox.insert(tk.END, opt)
             ents = lbox.get(0, tk.END)
             if len(ents) == 1:
@@ -100,12 +109,8 @@ class Dialog:
 
         app = tk.Tk()
 
-        x = app.winfo_pointerx() - 100
-        if x < 0:
-            x = 0
-        y = app.winfo_pointery() - 100
-        if y < 0:
-            y = 0
+        x = max(app.winfo_pointerx() - 100, 0)
+        y = max(app.winfo_pointery() - 100, 0)
         app.geometry('+' + str(x) + '+' + str(y))
         app.title('Select IAR Embedded Workbench version')
         app.minsize(cfg.min_window_width, 0)

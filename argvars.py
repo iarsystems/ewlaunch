@@ -15,12 +15,12 @@ class ArgVars:
 
         log.debug('reading argvars:' + argvars_filename)
         try:
-            argvars_file = open(argvars_filename, 'r', encoding='utf-8')
-        except IOError:
+            argvars_file = open(argvars_filename, encoding='utf-8')
+        except OSError:
             log.debug('Failed to open argvars file: ' + argvars_filename)
             return None
         argvars = argvars_file.read()
-        m = re.search(cfg.argvars_version_re, argvars, re.M)
+        m = re.search(cfg.argvars_version_re, argvars, re.MULTILINE)
         if not m:
             log.debug('No match in argvars')
             return None
@@ -43,10 +43,10 @@ class ArgVars:
                 argvars_file.write(exp.expand(cfg.template_footer))
             return
 
-        with open(argvars_filename, 'r', encoding='utf-8') as argvars_file:
+        with open(argvars_filename, encoding='utf-8') as argvars_file:
             argvars = argvars_file.read()
 
-        m = re.search(cfg.argvars_version_re, argvars, re.M)
+        m = re.search(cfg.argvars_version_re, argvars, re.MULTILINE)
         if not m:
             log.debug('Argvars file exists, with no EW_VERSION, adding it')
             with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
@@ -60,7 +60,7 @@ class ArgVars:
             return
 
         replaced_argvars = re.sub(cfg.argvars_version_re, m.group(
-            1) + version, argvars, flags=re.M)
+            1) + version, argvars, flags=re.MULTILINE)
         if replaced_argvars == argvars:
             log.debug('No change to argvars, skip writing')
             return

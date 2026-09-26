@@ -1,0 +1,18 @@
+[tool.pyright]
+reportUnusedImport = true
+reportUnusedVariable = true
+reportUnreachable = true
+reportUndefinedVariable = true
+reportUnusedExpression = true
+reportAssertAlwaysTrue = true
+reportDuplicateImport = true
+reportMissingTypeArgument = true
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "__pycache__",
+    "build",
+    "dist",
+]

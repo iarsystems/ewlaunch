@@ -6,3 +6,4 @@ ewlaunch.spec
 ewlaunch_win.spec
 *~
 #*#
+.ruff_cache

@@ -19,7 +19,7 @@ def listsubdirs(d):
         for f in os.listdir(d):
             if os.path.isdir(os.path.join(d, f)):
                 r.append(f)
-    except IOError:
+    except OSError:
         print('ERROR: could not read subdirs in ' + d)
     return r
 
@@ -89,7 +89,7 @@ class EwInst:
 
 def _shortname(ver):
     for r in cfg.shortname:
-        ver = re.sub(r, cfg.shortname[r], ver, flags=re.I)
+        ver = re.sub(r, cfg.shortname[r], ver, flags=re.IGNORECASE)
     return ver
 
 
@@ -113,7 +113,7 @@ def get(version_) -> EwInst:
 def getlist(pat):
     ret = []
     for ew in installations.values():
-        if re.search(pat, ew.key, re.I):
+        if re.search(pat, ew.key, re.IGNORECASE):
             ret.append(ew)
     ret.sort(key=lambda ew: ew.key)
     return ret

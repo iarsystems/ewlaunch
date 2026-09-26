@@ -97,7 +97,7 @@ def read():
 
     def getarg(name, fallback=None):
         v = getattr(args, name) if name in args else None
-        return v if v else fallback
+        return v or fallback
 
     def getflag(name, fallback=False):
         return getarg(name, ini.getboolean('args', name, fallback=fallback))

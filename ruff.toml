@@ -1,0 +1,46 @@
+line-length = 79
+indent-width = 4
+target-version = "py39"
+exclude = [
+    "build",
+    "dist",
+]
+
+[lint]
+select =  ["ALL"]
+ignore = [
+    "ANN",        # type annotations
+    "E722",       # bare-except (E722)
+    "COM812",     # missing-trailing-comma (COM812)
+    "D",          # pydocstyle (D)
+    "FIX002",     # line-contains-todo (FIX002)
+    "INP001",     # implicit-namespace-package (INP001)
+    "ISC003",     # explicit-string-concatenation (ISC003)
+    "PLR0913",    # too-many-arguments (PLR0913)
+    "PLR2004",    # magic-value-comparison (PLR2004)
+    "RUF005",     # collection-literal-concatenation (RUF005)
+    "S101",       # assert (S101)
+    "S603",       # subprocess-without-shell-equals-true (S603)
+    "SIM300",     # yoda-conditions (SIM300)
+    "TD",         # flake8-todos (TD)
+    "T201",       # print (T201)
+    "UP032",      # f-string (UP032)
+    "CPY001",     # missing-copyright-notice (CPY001)
+
+# should probably manually fix:
+    "N802",       # invalid-function-name (N802)
+    "N803",       # invalid-argument-name (N803)
+    "N806",       # non-lowercase-variable-in-function (N806)
+    "N816",       # mixed-case-variable-in-global-scope (N816)
+    "C901",       # complex-structure (C901)
+    "PLR0915",    # too-many-statements (PLR0915)
+    "PLR0911",    # too-many-return-statements (PLR0911)
+    "PLR0912",    # too-many-branches (PLR0912)
+]
+
+unfixable = [
+    "T201",       # the fix removes the print statements
+]
+
+[lint.flake8-quotes]
+inline-quotes = "single"
