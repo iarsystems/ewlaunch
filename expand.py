@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import cfg
 
@@ -12,7 +13,7 @@ _KEYS = {
     'EW_DIR': 'Top directory of IAR Embedded Workbench',
     'TOOLKIT': 'Name of toolkit directory, e.g. "arm"',
     'TOOLKIT_DIR': 'Full path of toolkit directory',
-    'EWLAUNCH_DIR': 'Full path fo EWLaunch directory'
+    'EWLAUNCH_DIR': 'Full path of EWLaunch directory'
 }
 
 
@@ -32,16 +33,18 @@ class Expand:
     def set_ew(self, ew):
         self.set('EW_VERSION', ew.key)
         self.set('EW_DIR', ew.ew_dir)
-        self.set('TOOLKIT', os.path.basename(ew.toolkit_dir))
-        self.set('TOOLKIT_DIR', ew.toolkit_dir)
+        tk = ew.toolkit_dir or ''
+        self.set('TOOLKIT', Path(tk).name)
+        self.set('TOOLKIT_DIR', tk)
 
     def set_ws(self, ws):
+        p = Path(ws)
         self.set('WS_PATH', ws)
-        self.set('WS_FNAME', os.path.basename(ws))
-        self.set('WS_BNAME', self.get('WS_FNAME').replace('.eww', ''))
-        self.set('WS_DIR', os.path.dirname(ws))
-        self.set('WS_BPATH', os.path.join(
-            self.get('WS_DIR'), self.get('WS_BNAME')))
+        self.set('WS_FNAME', p.name)
+        self.set('WS_BNAME', p.stem)
+        # Path('').parent is '.', keep these empty without workspace
+        self.set('WS_DIR', str(p.parent) if ws else '')
+        self.set('WS_BPATH', str(p.with_suffix('')) if ws else '')
 
     def expand(self, s):
         for key, val in self.attrs.items():

@@ -49,11 +49,10 @@ class Log:
         sys.exit(1)
 
     def run(self, func):
-        with redirect_stdout(self.messages):
-            with redirect_stderr(self.messages):
-                try:
-                    func()
-                except Exception:  # pylint: disable=broad-except
-                    self.die('Exception caught:\n' + traceback.format_exc())
-                except SystemExit:
-                    self.die('SystemExit')
+        with redirect_stdout(self.messages), redirect_stderr(self.messages):
+            try:
+                func()
+            except Exception:  # noqa: BLE001
+                self.die('Exception caught:\n' + traceback.format_exc())
+            except SystemExit:
+                self.die('SystemExit')

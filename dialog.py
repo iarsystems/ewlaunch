@@ -1,6 +1,6 @@
-import os
 import re
 import tkinter as tk
+from pathlib import Path
 from tkinter import IntVar, Listbox, StringVar, filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinter.ttk import (
@@ -89,15 +89,14 @@ class Dialog:
                 info.configure(state=tk.DISABLED)
 
         def key_pressed(event):
-            if event.char == '\r':
-                if self.selected_version:
-                    log.debug('<enter> pressed')
-                    callback_ok(None)
+            if event.char == '\r' and self.selected_version:
+                log.debug('<enter> pressed')
+                callback_ok(None)
 
         def callback_select(*_args):
             p = ws_var.get()
             if p:
-                p = os.path.dirname(p)
+                p = str(Path(p).parent)
             f = filedialog.askopenfilename(
                 initialdir=p,
                 title='Open file',

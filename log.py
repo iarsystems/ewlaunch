@@ -1,4 +1,6 @@
-from typing import NoReturn, Optional, Protocol
+from __future__ import annotations
+
+from typing import NoReturn, Protocol
 
 
 class Logger(Protocol):
@@ -6,7 +8,7 @@ class Logger(Protocol):
     def die(self, message: str) -> NoReturn: ...
 
 
-logger: Optional[Logger] = None
+logger: Logger | None = None
 
 
 def die(msg: str) -> NoReturn:

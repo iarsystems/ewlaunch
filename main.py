@@ -1,6 +1,7 @@
 import locale
 import os
 import subprocess
+from pathlib import Path
 
 import argvars
 import cfg
@@ -14,7 +15,7 @@ import log
 def check_workspace(ws):
     if not ws:
         return ws
-    if not os.path.isabs(ws):
+    if not Path(ws).is_absolute():
         log.die('path not absolute: ' + ws)
     if not ws.endswith('.eww'):
         ws += '.eww'
@@ -23,25 +24,24 @@ def check_workspace(ws):
 
 def get_workspace(ws):
     def find_eww(dr):
-        for f in os.listdir(dr):
-            if f.endswith('.eww'):
-                return os.path.join(dr, f)
+        for f in dr.iterdir():
+            if f.name.endswith('.eww'):
+                return str(f)
         return ''
 
     if not ws:
         return ws
-    ws = os.path.abspath(ws)
+    # Path.resolve() would also expand subst and mapped network drives
+    ws = os.path.abspath(ws)  # noqa: PTH100
+    ws_path = Path(ws)
 
-    if os.path.isdir(ws):
-        tmp = os.path.join(ws, os.path.basename(ws)) + '.eww'
-        if os.path.isfile(tmp):
+    if ws_path.is_dir():
+        tmp = str(ws_path / ws_path.name) + '.eww'
+        if Path(tmp).is_file():
             return tmp
-        tmp2 = find_eww(ws)
-        if tmp2:
-            return tmp2
-        return tmp
+        return find_eww(ws_path) or tmp
 
-    if os.path.isfile(ws):
+    if ws_path.is_file():
         if ws.endswith('.eww'):
             return ws
         if ws.endswith('.custom_argvars'):
@@ -49,32 +49,34 @@ def get_workspace(ws):
 
         log.die('Unexpected file name:' + ws)
 
-    if os.path.isfile(ws + '.eww'):
+    if Path(ws + '.eww').is_file():
         return ws + '.eww'
 
     return check_workspace(ws)
 
 
 def create_workspace(ws, exp):
-    if not os.path.isfile(ws):
-        dn = os.path.dirname(ws)
-        if not os.path.isdir(dn):
+    ws_path = Path(ws)
+    if not ws_path.is_file():
+        if not ws_path.parent.is_dir():
             log.debug('Making directories')
-            os.makedirs(dn)
+            ws_path.parent.mkdir(parents=True)
         log.debug('Writing eww: ' + ws)
-        with open(ws, 'w', encoding='utf8') as f:
-            f.write(exp.expand(cfg.workspace_template))
+        ws_path.write_text(exp.expand(cfg.workspace_template),
+                           encoding='utf8')
 
 
 def launch(ws, ew_sel, exp):
     if cfg.subcmd == 'shell':
-        initenv = os.path.join(cfg.ewlaunch_dir, 'init_shell.bat')
+        comspec = os.environ.get('COMSPEC', 'cmd.exe')
+        initenv = str(Path(cfg.ewlaunch_dir, 'init_shell.bat'))
         exp.setenv()
         if cfg.console:
-            proc = subprocess.Popen('cmd /k ' + initenv, shell=False)
+            proc = subprocess.Popen([comspec, '/k', initenv])
             cfg.wait_after_launch = True
         else:
-            proc = subprocess.Popen('start cmd /k ' + initenv, shell=True)
+            proc = subprocess.Popen([comspec, '/k', initenv],
+                                    creationflags=subprocess.CREATE_NEW_CONSOLE)
     else:
         os.chdir(cfg.ewlaunch_dir)
         if ew_sel.ide_exe is None:
@@ -116,8 +118,8 @@ def main():
             if cfg.rest_args:
                 if not cfg.noheading:
                     print(ew.key + ':')
-                args = [os.path.join(
-                    cfg.ewlaunch_dir, 'init_env.bat'), '&&'] + cfg.rest_args
+                args = [str(Path(cfg.ewlaunch_dir, 'init_env.bat')),
+                        '&&'] + cfg.rest_args
                 ret = subprocess.run(args,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT,
@@ -139,7 +141,7 @@ def main():
     else:
         selsrc = ''
         ew_initial = None
-        if os.path.isfile(ws):
+        if Path(ws).is_file():
             argvars_ver = arg_vars.read(ws, exp)
             if argvars_ver:
                 ew_initial = ewinst.get(argvars_ver)

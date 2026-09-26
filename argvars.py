@@ -1,5 +1,5 @@
-import os
 import re
+from pathlib import Path
 
 import cfg
 import log
@@ -15,11 +15,10 @@ class ArgVars:
 
         log.debug('reading argvars:' + argvars_filename)
         try:
-            argvars_file = open(argvars_filename, encoding='utf-8')
+            argvars = Path(argvars_filename).read_text(encoding='utf-8')
         except OSError:
             log.debug('Failed to open argvars file: ' + argvars_filename)
             return None
-        argvars = argvars_file.read()
         m = re.search(cfg.argvars_version_re, argvars, re.MULTILINE)
         if not m:
             log.debug('No match in argvars')
@@ -30,33 +29,33 @@ class ArgVars:
     def save(self, version, exp):
         argvars_filename = exp.expand(cfg.argvars_path)
         log.debug('saving argvars:' + argvars_filename)
+        argvars_file = Path(argvars_filename)
 
         if version == self.last_read:
             log.debug('version not changed, skipping save')
             return
 
-        if not os.path.isfile(argvars_filename):
+        if not argvars_file.is_file():
             log.debug('Argvars file does not exist, creating it')
-            with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
-                argvars_file.write(exp.expand(cfg.template_header))
-                argvars_file.write(exp.expand(cfg.template))
-                argvars_file.write(exp.expand(cfg.template_footer))
+            argvars_file.write_text(exp.expand(cfg.template_header)
+                                    + exp.expand(cfg.template)
+                                    + exp.expand(cfg.template_footer),
+                                    encoding='utf-8')
             return
 
-        with open(argvars_filename, encoding='utf-8') as argvars_file:
-            argvars = argvars_file.read()
+        argvars = argvars_file.read_text(encoding='utf-8')
 
         m = re.search(cfg.argvars_version_re, argvars, re.MULTILINE)
         if not m:
             log.debug('Argvars file exists, with no EW_VERSION, adding it')
-            with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
-                argvars = re.sub(
-                    '<iarUserArgVars */>',
-                    '<iarUserArgVars>\n</iarUserArgVars>',
-                    argvars)
-                argvars_file.write(argvars.replace(
-                    '<iarUserArgVars>',
-                    '<iarUserArgVars>\n' + exp.expand(cfg.template)))
+            argvars = re.sub(
+                '<iarUserArgVars */>',
+                '<iarUserArgVars>\n</iarUserArgVars>',
+                argvars)
+            argvars_file.write_text(argvars.replace(
+                '<iarUserArgVars>',
+                '<iarUserArgVars>\n' + exp.expand(cfg.template)),
+                encoding='utf-8')
             return
 
         replaced_argvars = re.sub(cfg.argvars_version_re, m.group(
@@ -66,5 +65,4 @@ class ArgVars:
             return
 
         log.debug('Argvars file exists, and contains EW_VERSION, replacing it')
-        with open(argvars_filename, 'w', encoding='utf-8') as argvars_file:
-            argvars_file.write(replaced_argvars)
+        argvars_file.write_text(replaced_argvars, encoding='utf-8')

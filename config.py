@@ -2,6 +2,7 @@ import argparse
 import configparser
 import os
 import sys
+from pathlib import Path
 
 import cfg
 
@@ -76,8 +77,7 @@ def _parse_command_line():
                        ', default is "scan.ini"')
 
     argv = sys.argv[1:]
-    # pylint: disable=protected-access
-    root_cmds = ['-h', '--help'] + list(subp._name_parser_map.keys())
+    root_cmds = ['-h', '--help'] + list(subp.choices or [])
     if len(argv) < 1 or argv[0] not in root_cmds:
         argv.insert(0, 'open')
 
@@ -91,15 +91,15 @@ def _multiline(s):
 def read():
     args = _parse_command_line()
 
-    cfg.ewlaunch_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    cfg.ewlaunch_dir = str(Path(os.path.abspath(sys.argv[0])).parent)  # noqa: PTH100
     ini = configparser.ConfigParser()
-    ini.read(os.path.join(cfg.ewlaunch_dir, 'ewlaunch.ini'))
+    ini.read(Path(cfg.ewlaunch_dir) / 'ewlaunch.ini')
 
     def getarg(name, fallback=None):
         v = getattr(args, name) if name in args else None
         return v or fallback
 
-    def getflag(name, fallback=False):
+    def getflag(name, *, fallback=False):
         return getarg(name, ini.getboolean('args', name, fallback=fallback))
 
     def getstr(name, fallback=None):
@@ -123,7 +123,8 @@ def read():
     cfg.argvars_path = ini['argvars']['path']
     cfg.argvars_version_re = ini['argvars']['version_re']
     cfg.workspace_template = _multiline(ini['workspace']['template'])
-    cfg.shortname = ini['shortname'] if 'shortname' in ini else {}
+    cfg.shortname = (ini['shortname'] if ini.has_section('shortname')
+                     else {})
 
     # command line args:
     cfg.subcmd = args.subparser_name

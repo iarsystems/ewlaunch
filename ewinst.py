@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import collections
 import configparser
-import os
 import re
 import sys
 import winreg
-from typing import Optional
+from pathlib import Path
 
 import cfg
 import log
@@ -15,14 +16,11 @@ installations = collections.OrderedDict()
 
 
 def listsubdirs(d):
-    r = []
     try:
-        for f in os.listdir(d):
-            if os.path.isdir(os.path.join(d, f)):
-                r.append(f)
+        return [f.name for f in Path(d).iterdir() if f.is_dir()]
     except OSError:
         print('ERROR: could not read subdirs in ' + d)
-    return r
+        return []
 
 
 def find_tkdir(dr, subd=None):
@@ -33,19 +31,17 @@ def find_tkdir(dr, subd=None):
     if 'install-info' in subd:
         subd.remove('install-info')
     for d in subd:
-        if os.path.isfile(os.path.join(dr, d, 'bin', 'icc' + d + '.exe')):
-            return os.path.join(dr, d)
+        tk = Path(dr, d)
+        if (tk / 'bin' / ('icc' + d + '.exe')).is_file():
+            return str(tk)
     return None
 
 
 def find_idepm(ew_dir):
-    common_bin = os.path.join(ew_dir, 'common', 'bin')
-    iaridepm = os.path.join(common_bin, 'IarIdePm.exe')
-    if os.path.isfile(iaridepm):
-        return iaridepm
-    iaride = os.path.join(common_bin, 'iaride.exe')
-    if os.path.isfile(iaride):
-        return iaride
+    common_bin = Path(ew_dir, 'common', 'bin')
+    for exe in ('IarIdePm.exe', 'iaride.exe'):
+        if (common_bin / exe).is_file():
+            return str(common_bin / exe)
     return None
 
 
@@ -94,7 +90,7 @@ def _shortname(ver):
     return ver
 
 
-def get(version_) -> Optional[EwInst]:
+def get(version_) -> EwInst | None:
     version = _shortname(version_).casefold()
     if len(version) == 0:
         return None
@@ -112,35 +108,30 @@ def get(version_) -> Optional[EwInst]:
 
 
 def getlist(pat):
-    ret = []
-    for ew in installations.values():
-        if re.search(pat, ew.key, re.IGNORECASE):
-            ret.append(ew)
+    ret = [ew for ew in installations.values()
+           if re.search(pat, ew.key, re.IGNORECASE)]
     ret.sort(key=lambda ew: ew.key)
     return ret
 
 
-def _make_unique(key):
+def _make_unique(key) -> str:
     key = _shortname(key)
     if key not in installations:
         return key
-    for i in range(1, 1000):
-        trykey = key + ' (' + str(i) + ')'
-        if trykey not in installations:
-            return trykey
-    log.die('could not get key')
+    i = 1
+    while key + ' (' + str(i) + ')' in installations:
+        i += 1
+    return key + ' (' + str(i) + ')'
 
 
 def _handle_ewkey(subkey, subenumkey, ewkey_):
     dr = winreg.QueryValueEx(subkey, 'InstallLocation')[0].strip()
     p = 'HKEY_LOCAL_MACHINE\\' + REG_PATH + '\\' + str(subenumkey)
     ew = EwInst(ewkey_, dr, p)
-    for sn in range(1000):
-        try:
-            v = winreg.EnumValue(subkey, sn)
-            ew.set_attr(v[0], v[1])
-        except OSError:
-            pass
+    n_values = winreg.QueryInfoKey(subkey)[1]
+    for sn in range(n_values):
+        name, value, _ = winreg.EnumValue(subkey, sn)
+        ew.set_attr(name, value)
 
 
 def _handle_enumkey(key, subenumkey):
@@ -161,15 +152,13 @@ def _handle_enumkey(key, subenumkey):
 def add_from_reg():
     access_registry = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
     with winreg.OpenKey(access_registry, REG_PATH) as key:
-        for n in range(1000):
-            try:
-                _handle_enumkey(key, winreg.EnumKey(key, n))
-            except OSError:
-                break
+        n_subkeys = winreg.QueryInfoKey(key)[0]
+        for n in range(n_subkeys):
+            _handle_enumkey(key, winreg.EnumKey(key, n))
 
 
 def add_from_file(filename):
-    if not os.path.isfile(filename):
+    if not Path(filename).is_file():
         log.die('could not open ' + filename)
 
     cp = configparser.ConfigParser()
@@ -184,20 +173,14 @@ def add_from_file(filename):
 
 
 def _dump(f):
-    frist = True
-    for ew in installations.values():
-        if not frist:
-            f.write('\n')
-        else:
-            frist = False
-        f.write(ew.get_info())
+    f.write('\n'.join(ew.get_info() for ew in installations.values()))
 
 
 def dump(filename):
     if filename == '-':
         _dump(sys.stdout)
     else:
-        with open(filename, 'w', encoding='utf-8') as f:
+        with Path(filename).open('w', encoding='utf-8') as f:
             _dump(f)
         print('\nWrote ' + filename + ' ... Done')
 
@@ -206,10 +189,9 @@ def _test(dr, subd):
     tk = find_tkdir(dr, subd)
     if not tk:
         return False
-    inst = EwInst(os.path.basename(tk) + ' ' +
-                  os.path.basename(dr), dr, 'scan', tk)
+    bn = Path(tk).name
+    inst = EwInst(bn + ' ' + Path(dr).name, dr, 'scan', tk)
     inst.check()
-    bn = os.path.basename(tk)
     has_ide = str(inst.ide_exe is not None)
     print(f'{dr}: tk={bn} ide={has_ide}')
     return True
@@ -220,7 +202,7 @@ def _search_dirs(root, dirs):
     test = False
     failed = []
     for d in dirs:
-        sd = os.path.join(root, d) if root else d
+        sd = str(Path(root, d)) if root else d
         subd = listsubdirs(sd)
         r = _test(sd, subd) if subd else False
         if r:
