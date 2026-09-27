@@ -20,5 +20,8 @@ jobs:
       - name: ruff
         run: uvx ruff@0.16.9 check --output-format=github .
 
+      - name: ruff format
+        run: uvx ruff@0.16.9 format --check --diff .
+
       - name: pyright
         run: uvx pyright@1.1.414 .
