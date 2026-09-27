@@ -17,7 +17,7 @@ class Log:
         app = tk.Tk()
         app.title(self.dialog_title)
         style = ttk.Style()
-        style.theme_use('default')
+        style.theme_use("default")
         root = tk.Frame(padx=2, pady=2)
         frame = tk.Frame(root, relief=tk.RAISED, borderwidth=1)
         frame.pack(fill=tk.BOTH, expand=True)
@@ -26,12 +26,12 @@ class Log:
         def callback_ok(*_args):
             app.destroy()
 
-        ok_button = tk.Button(root, text='Exit', command=callback_ok)
+        ok_button = tk.Button(root, text="Exit", command=callback_ok)
         ok_button.pack(side=tk.TOP, pady=2)
 
         scr = scrolledtext.ScrolledText(frame, width=100)
         scr.insert(tk.INSERT, self.messages.getvalue())
-        scr.configure(state='disabled')
+        scr.configure(state="disabled")
         scr.pack(fill=tk.BOTH, expand=True)
 
         app.mainloop()
@@ -44,7 +44,7 @@ class Log:
             sys.exit(1)
         self.died = True
         print()
-        print('died: ' + message)
+        print("died: " + message)
         self.dialog()
         sys.exit(1)
 
@@ -53,6 +53,6 @@ class Log:
             try:
                 func()
             except Exception:  # noqa: BLE001
-                self.die('Exception caught:\n' + traceback.format_exc())
+                self.die("Exception caught:\n" + traceback.format_exc())
             except SystemExit:
-                self.die('SystemExit')
+                self.die("SystemExit")

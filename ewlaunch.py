@@ -15,16 +15,16 @@ class Logger:
             print(message)
 
     def die(self, message) -> NoReturn:
-        print('died: ' + message)
+        print("died: " + message)
         sys.exit(1)
 
 
-cfg.exec_name = 'ewlaunch'
+cfg.exec_name = "ewlaunch"
 cfg.console = True
 
 log.logger = Logger()
-if '--debug' in sys.argv:
+if "--debug" in sys.argv:
     log.logger.print_debug = True
-    sys.argv.remove('--debug')
+    sys.argv.remove("--debug")
 
 main.main()

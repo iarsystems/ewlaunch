@@ -10,7 +10,7 @@ from pathlib import Path
 import cfg
 import log
 
-REG_PATH = r'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+REG_PATH = r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
 
 installations = collections.OrderedDict()
 
@@ -19,27 +19,27 @@ def listsubdirs(d):
     try:
         return [f.name for f in Path(d).iterdir() if f.is_dir()]
     except OSError:
-        print('ERROR: could not read subdirs in ' + d)
+        print("ERROR: could not read subdirs in " + d)
         return []
 
 
 def find_tkdir(dr, subd=None):
     if not subd:
         subd = listsubdirs(dr)
-    if 'common' in subd:
-        subd.remove('common')
-    if 'install-info' in subd:
-        subd.remove('install-info')
+    if "common" in subd:
+        subd.remove("common")
+    if "install-info" in subd:
+        subd.remove("install-info")
     for d in subd:
         tk = Path(dr, d)
-        if (tk / 'bin' / ('icc' + d + '.exe')).is_file():
+        if (tk / "bin" / ("icc" + d + ".exe")).is_file():
             return str(tk)
     return None
 
 
 def find_idepm(ew_dir):
-    common_bin = Path(ew_dir, 'common', 'bin')
-    for exe in ('IarIdePm.exe', 'iaride.exe'):
+    common_bin = Path(ew_dir, "common", "bin")
+    for exe in ("IarIdePm.exe", "iaride.exe"):
         if (common_bin / exe).is_file():
             return str(common_bin / exe)
     return None
@@ -56,15 +56,16 @@ class EwInst:
         installations[self.key] = self
 
     def set_attr(self, k, v):
-        if k == 'EW_DIR':
+        if k == "EW_DIR":
             return
         self.info[k] = str(v).strip()
-        if k == 'TOOLKIT_DIR':
+        if k == "TOOLKIT_DIR":
             self.toolkit_dir = v.strip()
-        elif k == 'IDE_EXE':
+        elif k == "IDE_EXE":
             self.ide_exe = v.strip()
 
-    def __str__(self): return self.key
+    def __str__(self):
+        return self.key
 
     def check(self):
         if not self.ide_exe:
@@ -74,9 +75,10 @@ class EwInst:
 
     def get_info(self):
         def p(k, v):
-            return '  ' + k + ': ' + str(v) + '\n'
-        msg = '[' + self.key + ']\n'
-        for k, v in [('EW_DIR', self.ew_dir), ('SRC', self.source)]:
+            return "  " + k + ": " + str(v) + "\n"
+
+        msg = "[" + self.key + "]\n"
+        for k, v in [("EW_DIR", self.ew_dir), ("SRC", self.source)]:
             if v:
                 msg += p(k, v)
         for k, v in self.info.items():
@@ -101,15 +103,13 @@ def get(version_) -> EwInst | None:
     for ew in installations.values():
         if version in ew.key.casefold():
             if found:
-                log.die('Multiple versions matching ' +
-                        version_ + ': ' + found.key + ', ' + ew.key)
+                log.die("Multiple versions matching " + version_ + ": " + found.key + ", " + ew.key)
             found = ew
     return found
 
 
 def getlist(pat):
-    ret = [ew for ew in installations.values()
-           if re.search(pat, ew.key, re.IGNORECASE)]
+    ret = [ew for ew in installations.values() if re.search(pat, ew.key, re.IGNORECASE)]
     ret.sort(key=lambda ew: ew.key)
     return ret
 
@@ -119,14 +119,14 @@ def _make_unique(key) -> str:
     if key not in installations:
         return key
     i = 1
-    while key + ' (' + str(i) + ')' in installations:
+    while key + " (" + str(i) + ")" in installations:
         i += 1
-    return key + ' (' + str(i) + ')'
+    return key + " (" + str(i) + ")"
 
 
 def _handle_ewkey(subkey, subenumkey, ewkey_):
-    dr = winreg.QueryValueEx(subkey, 'InstallLocation')[0].strip()
-    p = 'HKEY_LOCAL_MACHINE\\' + REG_PATH + '\\' + str(subenumkey)
+    dr = winreg.QueryValueEx(subkey, "InstallLocation")[0].strip()
+    p = "HKEY_LOCAL_MACHINE\\" + REG_PATH + "\\" + str(subenumkey)
     ew = EwInst(ewkey_, dr, p)
     n_values = winreg.QueryInfoKey(subkey)[1]
     for sn in range(n_values):
@@ -137,13 +137,13 @@ def _handle_ewkey(subkey, subenumkey, ewkey_):
 def _handle_enumkey(key, subenumkey):
     try:
         with winreg.OpenKey(key, subenumkey) as subkey:
-            publisher = winreg.QueryValueEx(subkey, 'Publisher')
-            if publisher[0] == 'IAR Systems':
-                ewkey = winreg.QueryValueEx(subkey, 'DisplayName')[0].strip()
-                dv = winreg.QueryValueEx(subkey, 'DisplayVersion')[0].strip()
+            publisher = winreg.QueryValueEx(subkey, "Publisher")
+            if publisher[0] == "IAR Systems":
+                ewkey = winreg.QueryValueEx(subkey, "DisplayName")[0].strip()
+                dv = winreg.QueryValueEx(subkey, "DisplayVersion")[0].strip()
                 if dv not in ewkey:
-                    ewkey += ' ' + dv
-                if 'Workbench' in ewkey and 'Library' not in ewkey:
+                    ewkey += " " + dv
+                if "Workbench" in ewkey and "Library" not in ewkey:
                     _handle_ewkey(subkey, subenumkey, ewkey)
     except OSError:
         pass
@@ -159,7 +159,7 @@ def add_from_reg():
 
 def add_from_file(filename):
     if not Path(filename).is_file():
-        log.die('could not open ' + filename)
+        log.die("could not open " + filename)
 
     cp = configparser.ConfigParser()
     cp.optionxform = str  # pyright: ignore[reportAttributeAccessIssue]
@@ -167,22 +167,22 @@ def add_from_file(filename):
 
     for sectname in cp.sections():
         sect = cp[sectname]
-        ew = EwInst(sectname, sect['EW_DIR'], filename)
+        ew = EwInst(sectname, sect["EW_DIR"], filename)
         for attr in sect:
             ew.set_attr(attr, sect[attr])
 
 
 def _dump(f):
-    f.write('\n'.join(ew.get_info() for ew in installations.values()))
+    f.write("\n".join(ew.get_info() for ew in installations.values()))
 
 
 def dump(filename):
-    if filename == '-':
+    if filename == "-":
         _dump(sys.stdout)
     else:
-        with Path(filename).open('w', encoding='utf-8') as f:
+        with Path(filename).open("w", encoding="utf-8") as f:
             _dump(f)
-        print('\nWrote ' + filename + ' ... Done')
+        print("\nWrote " + filename + " ... Done")
 
 
 def _test(dr, subd):
@@ -190,10 +190,10 @@ def _test(dr, subd):
     if not tk:
         return False
     bn = Path(tk).name
-    inst = EwInst(bn + ' ' + Path(dr).name, dr, 'scan', tk)
+    inst = EwInst(bn + " " + Path(dr).name, dr, "scan", tk)
     inst.check()
     has_ide = str(inst.ide_exe is not None)
-    print(f'{dr}: tk={bn} ide={has_ide}')
+    print(f"{dr}: tk={bn} ide={has_ide}")
     return True
 
 
@@ -217,7 +217,7 @@ def _search_dirs(root, dirs):
     # If at least one installation found, print sibblings without installation
     if test:
         for d in failed:
-            log.debug('Note: No installations found in ' + d)
+            log.debug("Note: No installations found in " + d)
 
     return found
 
@@ -228,7 +228,7 @@ def scan(rootdirs):
         r = _search_dirs(None, [d])
         total += r
         if r == 0:
-            print('Note: No installations found in ' + d)
-    print('total: ' + str(total) + ' installations found')
-    if cfg.out_file == '-':
+            print("Note: No installations found in " + d)
+    print("total: " + str(total) + " installations found")
+    if cfg.out_file == "-":
         print()

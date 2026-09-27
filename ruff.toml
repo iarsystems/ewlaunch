@@ -1,4 +1,4 @@
-line-length = 79
+line-length = 120
 indent-width = 4
 target-version = "py39"
 exclude = [
@@ -42,5 +42,6 @@ unfixable = [
     "T201",       # the fix removes the print statements
 ]
 
-[lint.flake8-quotes]
-inline-quotes = "single"
+[format]
+quote-style = "double"
+indent-style = "space"
