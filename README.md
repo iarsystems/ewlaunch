@@ -98,6 +98,7 @@ There are additional commands for dealing with installation files:
 
 ## Version history
 
+- 2.3 - 2026-10-01 - Window position centered unless it fits near the pointer.
 - 2.2 - 2026-04-27 - Store runtime in `_internal` dir, to avoid tmp dir error.
 - 2.1 - 2025-02-04 - Custom_argvars parsing bugfix.
 - 2.0 - 2022-05-24 - Shell and command function.

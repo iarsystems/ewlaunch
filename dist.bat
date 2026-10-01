@@ -34,7 +34,8 @@ copy init_env.bat %DIST%\%D%
 copy init_shell.bat %DIST%\%D%
 move %DIST%\ewlaunch\ewlaunch.exe %DIST%\%D%
 move %DIST%\ewlaunch_win\ewlaunch_win.exe %DIST%\%D%
-move %DIST%\ewlaunch_win\_internal %DIST%\%D%
+move %DIST%\ewlaunch_win\_internal %DIST%\%D%\_internal
+if not exist %DIST%\%D%\_internal\ (echo ERROR: _internal was not moved & exit /b 1)
 
 cd %DIST%
 %ZIP%  a -r %TGT% %D%

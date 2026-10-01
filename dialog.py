@@ -1,5 +1,8 @@
+import ctypes
 import re
+import sys
 import tkinter as tk
+from ctypes import wintypes
 from pathlib import Path
 from tkinter import IntVar, Listbox, StringVar, filedialog
 from tkinter.scrolledtext import ScrolledText
@@ -20,6 +23,58 @@ import ewinst
 import log
 
 _EWSN = tk.E + tk.W + tk.S + tk.N
+
+
+def _work_area(x, y):
+    """Work area (screen minus taskbar) of the monitor containing (x, y) as (left, top, right, bottom)."""
+
+    class MonitorInfo(ctypes.Structure):
+        _fields_ = [
+            ("cbSize", wintypes.DWORD),
+            ("rcMonitor", wintypes.RECT),
+            ("rcWork", wintypes.RECT),
+            ("dwFlags", wintypes.DWORD),
+        ]
+
+    user32 = ctypes.windll.user32
+    user32.MonitorFromPoint.argtypes = [wintypes.POINT, wintypes.DWORD]
+    user32.MonitorFromPoint.restype = wintypes.HANDLE
+    user32.GetMonitorInfoW.argtypes = [wintypes.HANDLE, ctypes.POINTER(MonitorInfo)]
+    mon = user32.MonitorFromPoint(wintypes.POINT(x, y), 2)  # MONITOR_DEFAULTTONEAREST
+    info = MonitorInfo()
+    info.cbSize = ctypes.sizeof(MonitorInfo)
+    if not mon or not user32.GetMonitorInfoW(mon, ctypes.byref(info)):
+        return None
+    r = info.rcWork
+    return r.left, r.top, r.right, r.bottom
+
+
+def _place_window(app, px, py):
+    """Position the window near the pointer; if it would not fit in the work area, center it on that monitor."""
+    app.update_idletasks()
+    w = max(app.winfo_width(), app.winfo_reqwidth())
+    h = max(app.winfo_height(), app.winfo_reqheight())
+    try:
+        area = _work_area(px, py)
+    except (AttributeError, OSError):
+        area = None
+    if area is None:
+        area = (0, 0, app.winfo_screenwidth(), app.winfo_screenheight())
+    left, top, right, bottom = area
+    x, y = px - 100, py - 100
+    if x < left or y < top or x + w > right or y + h > bottom:
+        x = left + (right - left - w) // 2
+        y = top + (bottom - top - h) // 2
+    app.geometry(f"+{max(x, left)}+{max(y, top)}")
+
+
+def _set_default_icon(app):
+    """Use the icon embedded in the frozen exe (or ewlaunch.ico when running from source) for the window/taskbar."""
+    icon = Path(sys.executable) if getattr(sys, "frozen", False) else Path(__file__).with_name("ewlaunch.ico")
+    try:
+        app.iconbitmap(default=str(icon))
+    except tk.TclError as e:
+        log.debug("Could not set window icon: " + str(e))
 
 
 class Dialog:
@@ -103,9 +158,9 @@ class Dialog:
 
         app = tk.Tk()
 
-        x = max(app.winfo_pointerx() - 100, 0)
-        y = max(app.winfo_pointery() - 100, 0)
-        app.geometry("+" + str(x) + "+" + str(y))
+        pointer = (app.winfo_pointerx(), app.winfo_pointery())
+        app.attributes("-alpha", 0)  # hidden until positioned
+        _set_default_icon(app)
         app.title("Select IAR Embedded Workbench version")
         app.minsize(cfg.min_window_width, 0)
 
@@ -203,6 +258,8 @@ class Dialog:
         app.bind("<Key>", key_pressed)
         app.update()
         app.minsize(root.winfo_width(), root.winfo_height())
+        _place_window(app, *pointer)
+        app.attributes("-alpha", 1)
         app.mainloop()
 
         if not self.ok_pressed:
