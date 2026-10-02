@@ -68,12 +68,53 @@ def _place_window(app, px, py):
     app.geometry(f"+{max(x, left)}+{max(y, top)}")
 
 
+def _own_icon_path():
+    """The icon embedded in the frozen exe, or ewlaunch.ico when running from source."""
+    return Path(sys.executable) if getattr(sys, "frozen", False) else Path(__file__).with_name("ewlaunch.ico")
+
+
+def _extract_icons(path):
+    """Return (large, small) HICONs of the first icon in path; either may be None."""
+    shell32 = ctypes.windll.shell32
+    shell32.ExtractIconExW.argtypes = [
+        wintypes.LPCWSTR,
+        ctypes.c_int,
+        ctypes.POINTER(wintypes.HANDLE),
+        ctypes.POINTER(wintypes.HANDLE),
+        wintypes.UINT,
+    ]
+    large, small = wintypes.HANDLE(), wintypes.HANDLE()
+    if shell32.ExtractIconExW(str(path), 0, ctypes.byref(large), ctypes.byref(small), 1) < 1:
+        return None, None
+    return large.value, small.value
+
+
+def _set_window_icons(app, large_src=None, small_src=None):
+    """Set the taskbar (large) icon from large_src and the titlebar (small) icon from small_src.
+
+    Both default to the ewlaunch icon. Only the large icon is used for the taskbar button and pinning, so the
+    titlebar can follow the selected EW version while the taskbar stays ewlaunch.
+    """
+    user32 = ctypes.windll.user32
+    user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPVOID]
+    user32.GetParent.argtypes = [wintypes.HWND]
+    user32.GetParent.restype = wintypes.HWND
+    hwnd = user32.GetParent(app.winfo_id()) or app.winfo_id()
+    wm_seticon, icon_small, icon_big = 0x0080, 0, 1
+    own = _own_icon_path()
+    big = _extract_icons(large_src or own)[0]
+    small = _extract_icons(small_src or own)[1]
+    if big:
+        user32.SendMessageW(hwnd, wm_seticon, icon_big, big)
+    if small:
+        user32.SendMessageW(hwnd, wm_seticon, icon_small, small)
+
+
 def _set_default_icon(app):
-    """Use the icon embedded in the frozen exe (or ewlaunch.ico when running from source) for the window/taskbar."""
-    icon = Path(sys.executable) if getattr(sys, "frozen", False) else Path(__file__).with_name("ewlaunch.ico")
     try:
-        app.iconbitmap(default=str(icon))
-    except tk.TclError as e:
+        app.iconbitmap(default=str(_own_icon_path()))
+        _set_window_icons(app)
+    except (tk.TclError, AttributeError, OSError) as e:
         log.debug("Could not set window icon: " + str(e))
 
 
@@ -129,7 +170,10 @@ class Dialog:
                 ew.check()
                 ok_button.configure(state=tk.ACTIVE)
                 self.selected_version = key
-                app.iconbitmap(ew.ide_exe)
+                try:
+                    _set_window_icons(app, small_src=ew.ide_exe)
+                except (AttributeError, OSError) as e:
+                    log.debug("Could not set titlebar icon: " + str(e))
                 if cfg.info_pane:
                     info.configure(state=tk.NORMAL)
                     info.replace("1.0", tk.END, ew.get_info())
@@ -260,6 +304,12 @@ class Dialog:
         app.minsize(root.winfo_width(), root.winfo_height())
         _place_window(app, *pointer)
         app.attributes("-alpha", 1)
+        # Icons set before the window is mapped are lost, so (re)apply them now, for the preselected version if any
+        ew = ewinst.get(self.selected_version) if self.selected_version else None
+        try:
+            _set_window_icons(app, small_src=ew.ide_exe if ew else None)
+        except (AttributeError, OSError) as e:
+            log.debug("Could not set window icons: " + str(e))
         app.mainloop()
 
         if not self.ok_pressed:
